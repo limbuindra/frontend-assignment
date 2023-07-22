@@ -25,14 +25,13 @@ const SearchProducts = () => {
 		},
 	});
 	
-
-	const handleSearchSubmit = (query) => {
+const handleSearchSubmit = (query) => {
 		setSearch(query);
 	};
 	return (
 		<>
 			<Searchbar onSubmit={handleSearchSubmit} />
-			<div className="grid sm:grid-cols-2 sm:gap-2 md:grid-cols-3  md:gap-3  lg:grid-cols-4 lg:gap-4 mt-8">
+			<div className="grid sm:grid-cols-2 sm:gap-2 md:grid-cols-3  md:gap-2  lg:grid-cols-4 lg:gap-4 mt-8">
 				{search && Query.data?.filter((product) => {
 					if (search ==='' ) {
 						return [];
