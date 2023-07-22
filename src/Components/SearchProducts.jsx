@@ -1,33 +1,47 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
 import axios from "axios";
-
+import { Link } from "react-router-dom";
+import Searchbar from "./Searchbar";
+import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { addItem } from "../Redux/actions";
 
-const Products = () => {
-	const dispatch = useDispatch();
-	const addProduct = (product) => {
-		dispatch(addItem(product));
-	};
+const SearchProducts = () => {
+	const [search, setSearch] = useState("");
+	const dispatch =  useDispatch();
+	const addProduct = (product)=>{
+	  dispatch(addItem(product));
+	}
 
-	const postQuery = useQuery({
-		queryKey: ["posts"],
+	const Query = useQuery({
+		queryKey: ["products",search],
 		queryFn: async () => {
-			const response = await axios.get("https://fakestoreapi.com/products");
+			if(!search) return [];
+			const response = await axios.get(
+				`https://fakestoreapi.com/products`
+			);
 			const data = await response.data;
-			// console.log(data);
 			return data;
 		},
 	});
-	console.log(postQuery.data);
-	if (postQuery.isLoading) return <h1>Loading....</h1>;
-	if (postQuery.isError) return <h1>Error Loading data !!!</h1>;
+	
+
+	const handleSearchSubmit = (query) => {
+		setSearch(query);
+	};
 	return (
 		<>
-			<div className="grid sm:grid-cols-2 sm:gap-2 md:grid-cols-3  md:gap-3  lg:grid-cols-4 lg:gap-6 mt-6 m-4 lg:m-6">
-				{postQuery.data.map((product) => {
+			<Searchbar onSubmit={handleSearchSubmit} />
+			<div className="grid sm:grid-cols-2 sm:gap-2 md:grid-cols-3  md:gap-3  lg:grid-cols-4 lg:gap-4 mt-8">
+				{search && Query.data?.filter((product) => {
+					if (search ==='' ) {
+						return [];
+					} else if (
+						product.title.toLowerCase().includes(search.toLowerCase())
+					) {
+						return [];
+					}
+				}).map((product) => {
 					const { id, image, title, price } = product;
 					return (
 						<>
@@ -35,7 +49,7 @@ const Products = () => {
 								<ul>
 									<li
 										key={id}
-										className="border-2 text-lg shadow-xl  rounded-md p-8 m-2 text-center "
+										className="border-2 text-lg shadow-xl  rounded-md p-8 m-6 text-center"
 									>
 										<Link to={`/products/${id}`}>
 											<img className="h-72 w-60" src={image} alt="" />
@@ -68,4 +82,4 @@ const Products = () => {
 	);
 };
 
-export default Products;
+export default SearchProducts;
